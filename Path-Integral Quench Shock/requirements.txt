@@ -1,0 +1,60 @@
+# ============================================================
+# pathint-quench-nvda — requirements.txt
+# Python 3.13
+# ============================================================
+
+# --- Núcleo numérico ---
+numpy>=2.1.0
+scipy>=1.14.0
+pandas>=2.2.3
+
+# --- Descarga de datos de mercado ---
+yfinance>=0.2.50
+requests>=2.32.0
+curl_cffi>=0.7.0          # yfinance lo usa para evitar bloqueos de Yahoo
+
+# --- Visualización ---
+matplotlib>=3.9.0
+seaborn>=0.13.2
+plotly>=5.24.0            # opcional, para gráficos interactivos de la PDF
+
+# --- Estadística y tests ---
+statsmodels>=0.14.4
+scikit-learn>=1.5.2       # para optimización de los 5 parámetros del modelo
+
+# --- Aceleración numérica (integral de camino) ---
+numba>=0.62.0             # imprescindible para Monte Carlo / integración a 1 min
+
+# --- Utilidades ---
+tqdm>=4.66.5              # barras de progreso en simulaciones largas
+python-dateutil>=2.9.0
+pytz>=2024.2
+tabulate>=0.9.0           # tablas formateadas en consola / notebooks
+pyyaml>=6.0.2             # para guardar la configuración de parámetros calibrados
+
+# --- Entorno de trabajo (notebooks y reproducibilidad) ---
+jupyterlab>=4.2.5
+ipykernel>=6.29.5
+ipywidgets>=8.1.5
+nbformat>=5.10.4
+
+# --- Testing y calidad de código ---
+pytest>=8.3.3
+pytest-cov>=6.0.0
+ruff>=0.7.0               # linter rápido y moderno
+mypy>=1.13.0              # chequeo de tipos (útil por los arrays de numpy)
+
+# ============================================================
+# NOTAS DE COMPATIBILIDAD PYTHON 3.13
+# ============================================================
+# - numpy 2.1+ y scipy 1.14+ son las primeras versiones con wheels
+#   oficiales para 3.13. Si pip intenta compilar desde fuente, actualiza pip:
+#       python -m pip install --upgrade pip setuptools wheel
+#
+# - numba 0.62+ añadió soporte para 3.13. Si no la necesitas (porque
+#   implementas la integral de camino de forma vectorizada con numpy),
+#   puedes eliminarla del archivo sin problema.
+#
+# - yfinance cambia de API con frecuencia; si en el futuro falla la
+#   descarga de 1m, revisa las notas de la versión instalada.
+# ============================================================

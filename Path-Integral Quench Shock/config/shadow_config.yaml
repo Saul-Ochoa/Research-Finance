@@ -1,0 +1,40 @@
+# =====================================================================
+# Shadow production configuration (operational, NOT model parameters).
+# Model parameters live in params_calibrated.yaml (frozen, SHA-256).
+# Editing this file never changes a forecast distribution; it only
+# changes what is run, where it is written and when alerts fire.
+# =====================================================================
+tickers: [NVDA, SPY]
+
+modes:
+  daily_close_overnight:
+    enabled: true
+    trigger_et: "16:05"              # earliest ET time a prediction may be made (session must be closed)
+    horizon_minutes: 1050            # must equal T_minutes in params_calibrated.yaml (checked at runtime)
+    reference_price: "close_at_16:00"  # close of the last clean regular-session bar (normally 15:59)
+    target: "open_next_session_09:30"  # Open of the 09:30 bar of the next day with data
+  minute_intraday:
+    enabled: false                   # optional, not implemented in v1.0.0 shadow
+    horizon_minutes: 60
+    trigger: "every_minute_09:30_to_15:00"
+
+paths:                               # relative to the project root
+  predictions: "data/predictions"    # {ticker}/YYYY-MM-DD.jsonl  (append-only)
+  evaluations: "data/evaluations"    # {ticker}/YYYY-MM-DD.jsonl  (append-only, filed by prediction date)
+  output: "output"                  # DERIVED, regenerable from data/ (D-022); never a source of truth
+  reports: "output/reports"
+  logs: "logs"
+
+prediction:
+  n_samples_simulated: 100000        # Monte Carlo paths per prediction (deterministic seed)
+  n_samples_stored: 1000             # samples written to JSONL for reports
+
+thresholds:
+  alert_pit_deviation: 0.15          # KS distance of PIT values vs Uniform(0,1)
+  alert_coverage_90_below: 0.85      # empirical coverage of [q05, q95]
+  alert_consecutive_misses_99: 3     # consecutive realized returns outside [q005, q995]
+  min_evaluations_for_rate_alerts: 20  # coverage/PIT alerts only fire with at least this many (standard-horizon) evaluations
+
+data_quality:
+  bad_tick_filter: "src.returns.detectar_bad_ticks"
+  max_missing_bars_pct: 0.05         # share of the 390 regular-session bars; above → warning + note, not a block

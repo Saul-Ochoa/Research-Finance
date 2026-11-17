@@ -1,0 +1,33 @@
+# Path-Integral Quench Shock — git policy (D-025, supersedes D-024)
+# Evidence is versioned; only derived artifacts and the environment are ignored.
+
+# --- Environment and tooling ---
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+
+# --- Operational logs ---
+logs/
+
+# --- Derived output (regenerable from data/, D-022) ---
+# Contents are ignored; each folder keeps its .gitkeep.
+output/metrics/**/*.json
+output/metrics/**/*.tmp
+output/reports/**/*
+!output/reports/**/
+!output/reports/**/.gitkeep
+output/exports/*
+!output/exports/.gitkeep
+
+# --- Re-include evidence ignored by the parent repo's .gitignore (*.csv, *.json there) ---
+# This file is deeper, so its negations take precedence for this project.
+!data/raw/yahoo_1m/**/*.csv
+!output/backtests/*.json
+
+# VERSIONED ON PURPOSE (evidence; do not add ignore rules for these):
+#   config/params_calibrated.yaml, config/archive/*.yaml   frozen and archived parameter versions
+#   data/raw/yahoo_1m/**/*.csv                             only copy of Yahoo 1-min bars older than ~30 days (L-011)
+#   data/predictions/, data/evaluations/                    append-only shadow records
+#   output/backtests/*.json                                 one file per backfill run (D-022)

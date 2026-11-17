@@ -1,0 +1,57 @@
+# =====================================================================
+# Parámetros CONGELADOS del modelo Paolinelli–Arioli (jump-diffusion)
+# Generado por scripts/calibrate_params.py — NO EDITAR A MANO.
+# Cualquier cambio rompe integrity.sha256 y el shadow falla con
+#   PARAMS_VERSION_MISMATCH: re-calibration detected
+# Para re-calibrar: python scripts/calibrate_params.py --version <mayor>
+# =====================================================================
+version: "1.0.0"                 # versión semántica; el shadow no mezcla versiones
+calibrated_at: "2026-11-16"      # fecha de la calibración (America/New_York)
+calibration_window: ["2026-11-06", "2026-11-11T16:00:00-05:00"]  # [inicio, fin) — nada posterior al cierre regular del 11-nov
+calibration_data: "yahoo_1m, sesión Regular, retornos log Δt=1 min, sin bad ticks (src/returns.py)"
+
+tickers:
+  NVDA:
+    sigma: 0.0015240721931981285           # CALIBRADO: volatilidad total de 1 minuto (desv. típica del log-retorno)
+    alpha1: 0.26373073160413324          # CALIBRADO: intensidad de saltos por órdenes, λ (saltos/minuto)
+    alpha2: 1.4930694464153476          # CALIBRADO: tamaño del salto en unidades de σ (σ_J = α2·σ)
+    T_minutes: 1050                # FIJO por diseño: close 16:00 → open 09:30 = 17.5 h = 1050 min
+    N_steps: 80                    # FIJO por convergencia: N=40/80/160 → máx |Δcuantil| = 0.00043
+    approximation: "jump_diffusion"  # kernel MH del paper no implementado; ver src/paolinelli_arioli.py
+    jump_params:                   # DERIVADOS de (sigma, alpha1, alpha2); el modelo verifica coherencia
+      lambda_jumps_per_min: 0.26373073160413324   # = alpha1
+      mu_jump: 0.0                 # saltos simétricos (no se pronostica dirección)
+      sigma_jump: 0.0022755456257953543    # = alpha2 · sigma (log-retorno)
+  SPY:
+    sigma: 0.0003781762011936107           # CALIBRADO: volatilidad total de 1 minuto (desv. típica del log-retorno)
+    alpha1: 0.3850848579824615          # CALIBRADO: intensidad de saltos por órdenes, λ (saltos/minuto)
+    alpha2: 1.3311340164481622          # CALIBRADO: tamaño del salto en unidades de σ (σ_J = α2·σ)
+    T_minutes: 1050                # FIJO por diseño: close 16:00 → open 09:30 = 17.5 h = 1050 min
+    N_steps: 80                    # FIJO por convergencia: N=40/80/160 → máx |Δcuantil| = 0.00023
+    approximation: "jump_diffusion"  # kernel MH del paper no implementado; ver src/paolinelli_arioli.py
+    jump_params:                   # DERIVADOS de (sigma, alpha1, alpha2); el modelo verifica coherencia
+      lambda_jumps_per_min: 0.3850848579824615   # = alpha1
+      mu_jump: 0.0                 # saltos simétricos (no se pronostica dirección)
+      sigma_jump: 0.0005034032056199592    # = alpha2 · sigma (log-retorno)
+
+# Diagnósticos de la calibración (informativos, no firmados)
+diagnostics:
+  NVDA:
+    n_returns: 1558            # retornos de 1 minuto usados
+    ks_model: 0.01264           # KS(z empírico, JD 1 min)
+    ks_gbm: 0.05854             # KS(z empírico, normal) — referencia
+    kurtosis_empirical: 3.9319   # curtosis en exceso empírica a 1 min
+    kurtosis_model_1min: 3.9319  # 3·α1·α2⁴
+    kurtosis_model_T: 0.003745   # a horizonte T (= κ_1min / T)
+    expected_jumps_in_T: 276.9173  # α1·T
+  SPY:
+    n_returns: 1556            # retornos de 1 minuto usados
+    ks_model: 0.02600           # KS(z empírico, JD 1 min)
+    ks_gbm: 0.07736             # KS(z empírico, normal) — referencia
+    kurtosis_empirical: 3.6271   # curtosis en exceso empírica a 1 min
+    kurtosis_model_1min: 3.6271  # 3·α1·α2⁴
+    kurtosis_model_T: 0.003454   # a horizonte T (= κ_1min / T)
+    expected_jumps_in_T: 404.3391  # α1·T
+
+integrity:
+  sha256: "a14cb86a14c52ec4a5c6e58ff86eb291c3fb291ad0ff06633158c5041c026c93"   # huella de version + calibration_window + tickers
